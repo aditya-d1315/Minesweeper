@@ -51,6 +51,14 @@ public class Environment {
     }
 
     /**
+     * Getter mmethod for the dimension of the board.
+     * @return The dimension of the environment's board.
+     */
+    public int getDim() {
+        return dim;
+    }
+
+    /**
      * Getter method for number of mines.
      * @return The num_mines.
      */
@@ -81,11 +89,7 @@ public class Environment {
         }
 
         // No safe space.
-        if(num_mines == (dim * dim)) {
-            return true;
-        }
-
-        return false;
+        return num_mines == (dim * dim);
     }
 
     /**
