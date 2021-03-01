@@ -51,6 +51,14 @@ public class Environment {
     }
 
     /**
+     * Getter method for the board's dimension.
+     * @return The dimension of the board.
+     */
+    public int getDim() {
+        return dim;
+    }
+
+    /**
      * Getter method for number of mines.
      * @return The num_mines.
      */
