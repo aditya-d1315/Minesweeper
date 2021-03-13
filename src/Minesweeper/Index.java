@@ -18,6 +18,15 @@ public class Index {
     }
 
     /**
+     * toString method for printing Index object in (col, row) to match (x, y).
+     * @return String representation of Index object.
+     */
+    @Override
+    public String toString() {
+        return "(" + row + ", " + col + ")";
+    }
+
+    /**
      * Equals method to compare two indices.
      * @param obj   : The other index object to compare to.
      * @return true if the two indices are the same, false otherwise.
