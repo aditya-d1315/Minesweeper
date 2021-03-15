@@ -5,7 +5,9 @@ import java.util.Random;
 public class Main {
     public static void main(String[] args) {
         // Test environment.
-        Environment test = new Environment(10, 30);
+        int dim = 10;
+        int numMines = 30;
+        Environment test = new Environment(dim, numMines);
         //System.out.println(test.getNum_mines());
 
         /*
@@ -15,11 +17,11 @@ public class Main {
         System.out.println(agent);
 
         */
-        // TODO: Test select + query on entire board @ random.
+
         BasicAgent ag = new BasicAgent(test.getBoard());
 
         Random rand = new Random();
-        int dim = test.getBoard().length;
+        dim = test.getBoard().length;
         int numRevealedCells = 0;
 
         while(numRevealedCells + ag.getMineCells().size() < dim * dim) {
@@ -54,5 +56,7 @@ public class Main {
             System.out.println("Revealed: " + numRevealedCells + " + " + ag.getMineCells().size() + " = " +  (numRevealedCells + ag.getMineCells().size()));
             System.out.println();
         }
+
+        System.out.println("Final score: " + ag.getMineCells().size() + " / " + numMines); // DEBUG
     }
 }
