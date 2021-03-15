@@ -6,7 +6,6 @@ public class Main {
     public static void main(String[] args) {
         // Test environment.
         Environment test = new Environment(10, 30);
-        System.out.println("Original board:\n" + test);
         //System.out.println(test.getNum_mines());
 
         /*
@@ -23,29 +22,37 @@ public class Main {
         int dim = test.getBoard().length;
         int numRevealedCells = 0;
 
-        while(numRevealedCells < dim * dim) {
+        while(numRevealedCells + ag.getMineCells().size() < dim * dim) {
             int row = rand.nextInt(dim);
             int col = rand.nextInt(dim);
 
             // Pick from list of safe cells if not empty.
             if(!ag.getSafeCells().isEmpty()) {
-                row = ag.getSafeCells().get(0).getRow();
-                col = ag.getSafeCells().get(0).getCol();
+                Index index = ag.getSafeCells().pop();
+                row = index.getRow();
+                col = index.getCol();
             } else {
                 // Generate until cell is unrevealed and not in list of mine cells.
-                while(ag.getKnowledgeBase()[row][col].getRevealed() && !ag.getMineCells().contains(new Index(row, col))) {
+                Index index = new Index(row, col);
+                while(ag.getKnowledgeBase()[row][col].getRevealed() || ag.getMineCells().contains(index)) {
                     row = rand.nextInt(dim);
                     col = rand.nextInt(dim);
+                    index = new Index(row, col);
                 }
             }
 
             ag.selectCell(row, col);
             ag.queryCell(row, col);
 
-            System.out.println("Selected (" + row + ", " + col + ")\n" + ag);
-            System.out.println("Safe cells: " + ag.getSafeCells());
-            System.out.println("Mine cells: " + ag.getMineCells() + "\n");
             numRevealedCells++;
+
+            // DEBUG
+            System.out.println("Original board (unknown to agent):\n" + test);
+            System.out.println("Selected (" + row + ", " + col + "); " + ag.getKnowledgeBase()[row][col] + "\n" + ag);
+            System.out.println("Safe cells: " + ag.getSafeCells());
+            System.out.println("Mine cells: " + ag.getMineCells());
+            System.out.println("Revealed: " + numRevealedCells + " + " + ag.getMineCells().size() + " = " +  (numRevealedCells + ag.getMineCells().size()));
+            System.out.println();
         }
     }
 }

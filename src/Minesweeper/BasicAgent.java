@@ -1,6 +1,7 @@
 package Minesweeper;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 /**
  * This is the class for the basic agent.
@@ -11,7 +12,7 @@ public class BasicAgent {
     private Cell[][] knowledgeBase; // Parallel matrix that stores information about cells.
 
     // ArrayLists for guesses.
-    private ArrayList<Index> safeCells;
+    private Stack<Index> safeCells;
     private ArrayList<Index> mineCells;
 
     /**
@@ -29,7 +30,7 @@ public class BasicAgent {
             }
         }
 
-        safeCells = new ArrayList<Index>();
+        safeCells = new Stack<Index>();
         mineCells = new ArrayList<Index>();
     }
 
@@ -49,14 +50,15 @@ public class BasicAgent {
                         continue;                        
                     }
                     knowledgeBase += " " + this.knowledgeBase[row][col].getClue() + " ";
-                    continue;
-                }
-                if(this.knowledgeBase[row][col].getAgentsGuess() == -1) {
-                    knowledgeBase += " m ";
-                } else if(this.knowledgeBase[row][col].getAgentsGuess() == 1) {
-                    knowledgeBase += " s ";
-                } else {    // Unknown.
-                    knowledgeBase += " ? ";
+                } else {
+                    Index index = new Index(row, col);
+                    if(mineCells.contains(index)) {
+                        knowledgeBase += " m ";
+                    } else if(safeCells.contains(index)) {
+                        knowledgeBase += " s ";
+                    } else {    // Unknown.
+                        knowledgeBase += " ? ";
+                    }
                 }
             }
             knowledgeBase += "\n";
@@ -71,20 +73,17 @@ public class BasicAgent {
      * @param col
      */
     public void selectCell(int row, int col) {
-        // Mark revealed.
+        // Mark revealed and set clue.
         knowledgeBase[row][col].setRevealed(true);
-
-        // Set clue.
         knowledgeBase[row][col].setClue(board[row][col]);
 
-        // Remove from lists, if in list.
-        if(safeCells.contains(new Index(row, col))) {
-            safeCells.remove(new Index(row, col));
+        // If mine, add to list of mines.
+        /*
+        Index index = new Index(row, col);
+        if(knowledgeBase[row][col].getClue() == -1 && !mineCells.contains(index)) {
+            mineCells.add(index);
         }
-
-        if(mineCells.contains(new Index(row, col))) {
-            mineCells.remove(new Index(row, col));
-        }
+        */
     }
 
     /**
@@ -98,14 +97,17 @@ public class BasicAgent {
 
         // Make guesses.
         int clue = knowledgeBase[row][col].getClue();
-        int revealed = knowledgeBase[row][col].getNumSafeCells() + knowledgeBase[row][col].getNumMineCells();
+        int revealedSafe = knowledgeBase[row][col].getNumSafeCells();
+        int revealedMine = knowledgeBase[row][col].getNumMineCells();
+        int revealed = revealedSafe + revealedMine;
         int hidden = knowledgeBase[row][col].getNumHiddenCells();
+        int numNeighbors = revealed + hidden;   // Total number of neighbors.
 
         int agentsGuess = 0;
         // If clue - revealed = hidden, every hidden is mine.
-        if(clue - revealed == hidden) {
+        if(clue - revealedMine == hidden) {
             agentsGuess = -1;   // Mark hidden probably mines.
-        } else if(8 - clue == hidden) { // If 8 - clue = hidden, every hidden is safe.
+        } else if((numNeighbors - clue) - revealedSafe == hidden) { // If 8 - clue = hidden, every hidden is safe.
             agentsGuess = 1;    // Mark hidden probably safe.
         }
 
@@ -122,13 +124,17 @@ public class BasicAgent {
         while(current_row < end_row + 1) {
             while(current_col < end_col + 1) {
                 // If not center and not revealed:
-                if(current_row != row && current_col != col
-                    && !knowledgeBase[current_row][current_col].getRevealed()) {
-                    if(agentsGuess == -1 && !mineCells.contains(new Index(row, col))) {
-                        mineCells.add(new Index(row, col));
-                    } else if(agentsGuess == 1 && !safeCells.contains(new Index(row, col))) {
-                        safeCells.add(new Index(row, col));
+                if(!(current_row == row && current_col == col) && !knowledgeBase[current_row][current_col].getRevealed()) {
+                    Index index = new Index(current_row, current_col);
+                    if(agentsGuess == -1 && !mineCells.contains(index)) {
+                        mineCells.add(index);
+                        // System.out.println(index + " suspected unsafe."); // DEBUG
+                    } else if(agentsGuess == 1 && !safeCells.contains(index)) {
+                        safeCells.add(index);
+                        // System.out.println(index + " should be safe."); // DEBUG
                     }
+
+                    knowledgeBase[current_row][current_col].setAgentsGuess(agentsGuess);
                 }
                 current_col++;
             }
@@ -157,7 +163,7 @@ public class BasicAgent {
         while(current_row < end_row + 1) {
             while(current_col < end_col + 1) {
                 // If not center, revealed, and not a mine, increment number of safe neighbors.
-                if(current_row != row && current_col != col
+                if(!(current_row == row && current_col == col)
                     && knowledgeBase[current_row][current_col].getRevealed()
                     && knowledgeBase[current_row][current_col].getClue() >= 0) {
                     safeNeighbors++;
@@ -191,7 +197,7 @@ public class BasicAgent {
         while(current_row < end_row + 1) {
             while(current_col < end_col + 1) {
                 // If not center, revealed, and is a mine, increment number of mine neighbors.
-                if(current_row != row && current_col != col
+                if(!(current_row == row && current_col == col)
                     && knowledgeBase[current_row][current_col].getRevealed()
                     && knowledgeBase[current_row][current_col].getClue() == -1) {
                         mineNeighbors++;
@@ -224,10 +230,9 @@ public class BasicAgent {
         int current_col = start_col;
         while(current_row < end_row + 1) {
             while(current_col < end_col + 1) {
-                // If not center, revealed, and is a mine, increment number of mine neighbors.
-                if(current_row != row && current_col != col
-                    && !knowledgeBase[current_row][current_col].getRevealed()) {
-                        hiddenNeighbors++;
+                // If not center, and not revealed, count.
+                if(!(current_row == row && current_col == col) && !knowledgeBase[current_row][current_col].getRevealed()) {
+                    hiddenNeighbors++;
                 }
                 current_col++;
             }
@@ -250,7 +255,7 @@ public class BasicAgent {
      * Getter method for list of safe cells.
      * @return List of safe cells.
      */
-    public ArrayList<Index> getSafeCells() {
+    public Stack<Index> getSafeCells() {
         return safeCells;
     }
 

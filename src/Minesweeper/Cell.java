@@ -50,7 +50,7 @@ public class Cell {
             cellString += "hidden ";
         }
 
-        cellString += numSafeCells + " safe neighbors," + numMineCells + " mines, " + numHiddenCells + " hidden neighbors, ";
+        cellString += numSafeCells + " safe neighbors, " + numMineCells + " mines, " + numHiddenCells + " hidden neighbors, ";
 
         if(agentsGuess == -1) {
             cellString += "probably mine";
