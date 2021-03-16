@@ -18,7 +18,7 @@ public class Main {
 
         */
 
-        BasicAgent ag = new BasicAgent(test.getBoard());
+        ModifiedAgent ag = new ModifiedAgent(test.getBoard());
 
         Random rand = new Random();
         dim = test.getBoard().length;
