@@ -7,6 +7,7 @@ public class ModifiedCell extends Cell {
 
     public ModifiedCell(boolean revealed, int clue, int numSafeCells, int numMineCells, int numHiddenCells, int agentsGuess) {
         super(revealed, clue, numSafeCells, numMineCells, numHiddenCells, agentsGuess);
+        this.probability = 0;
     }
 
     public void setProbability(double probability) {
