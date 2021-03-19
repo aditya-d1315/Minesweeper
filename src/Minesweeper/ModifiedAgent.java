@@ -75,31 +75,8 @@ public class ModifiedAgent {
         knowledgeBase[row][col].setRevealed(true);
         knowledgeBase[row][col].setClue(board[row][col]);
 
-        //Update clue_sum for neighboring cells.
-        int clue = knowledgeBase[row][col].getClue();
-        int start_row = row - 1 >= 0 ? row - 1 : row;   // If expanding up is possible ...
-        int start_col = col - 1 >= 0 ? col - 1 : col;   // If expanding left is possible ...
-        int end_row = row + 1 < board.length ? row + 1 : row;    // If expanding down is possible ...
-        int end_col = col + 1 < board.length ? col + 1 : col;    // If expanding right is possible ...
-        int current_row = start_row;
-        int current_col = start_col;
-        while(current_row < end_row + 1) {
-            while(current_col < end_col + 1) {
-                if(!(current_row == row && current_col == col) && !knowledgeBase[current_row][current_col].getRevealed()) {
-                    if(clue != -1) {
-                        knowledgeBase[current_row][current_col].setClueSum(knowledgeBase[current_row][current_col].getClueSum() + clue);
-                    }
-                    int numNeighbors = countHiddenNeighbors(current_row, current_col)
-                            + countMineNeighbors(current_row, current_col)
-                            + countSafeNeighbors(current_row, current_col);
-                    knowledgeBase[current_row][current_col].setProbability((double)(knowledgeBase[current_row][current_col].getClueSum()) / numNeighbors);
-
-                    //System.out.println(knowledgeBase[current_row][current_col].getClueSum() + "/" + numNeighbors + " = " + knowledgeBase[current_row][current_col].getProbability()); //DEBUG
-                }
-                current_col ++;
-            }
-            current_row ++;
-            current_col = start_col;
+        if(knowledgeBase[row][col].getClue() == -1) {
+            knowledgeBase[row][col].setProbability(1.0);
         }
     }
 
@@ -152,6 +129,11 @@ public class ModifiedAgent {
                     }
 
                     knowledgeBase[current_row][current_col].setAgentsGuess(agentsGuess);
+
+                    // Update probability of current hidden (neighboring) cell.
+                    if(knowledgeBase[row][col].getClue() >= 0) {
+                        // updateCellProbability(current_row, current_col);
+                    }
                 }
                 current_col++;
             }
@@ -261,10 +243,195 @@ public class ModifiedAgent {
     }
 
     /**
+     * Helper method to count up number of marked safe neighboring a cell.
+     */
+    private int countMarkedSafe(int row, int col) {
+        int markedSafe = 0;
+        int dim = board.length;
+
+        // Expand from center.
+        int start_row = row - 1 >= 0 ? row - 1 : row;   // If expanding up is possible ...
+        int start_col = col - 1 >= 0 ? col - 1 : col;   // If expanding left is possible ...
+        int end_row = row + 1 < dim ? row + 1 : row;    // If expanding down is possible ...
+        int end_col = col + 1 < dim ? col + 1 : col;    // If expanding right is possible ...
+        int current_row = start_row;
+        int current_col = start_col;
+        while(current_row < end_row + 1) {
+            while(current_col < end_col + 1) {
+                // If not center, not revealed, and is a marked mine, count.
+                if(!(current_row == row && current_col == col) 
+                    && !knowledgeBase[current_row][current_col].getRevealed()
+                    && safeCells.contains(new Index(current_row, current_col))) {
+                    markedSafe++;
+                }
+                current_col++;
+            }
+            current_row++;
+            current_col = start_col;
+        }
+
+        return markedSafe;
+    }
+
+    /**
+     * Helper method to count up number of marked mines neighboring a cell.
+     */
+    private int countMarkedMines(int row, int col) {
+        int markedMines = 0;
+        int dim = board.length;
+
+        // Expand from center.
+        int start_row = row - 1 >= 0 ? row - 1 : row;   // If expanding up is possible ...
+        int start_col = col - 1 >= 0 ? col - 1 : col;   // If expanding left is possible ...
+        int end_row = row + 1 < dim ? row + 1 : row;    // If expanding down is possible ...
+        int end_col = col + 1 < dim ? col + 1 : col;    // If expanding right is possible ...
+        int current_row = start_row;
+        int current_col = start_col;
+        while(current_row < end_row + 1) {
+            while(current_col < end_col + 1) {
+                // If not center, not revealed, and is a marked mine, count.
+                if(!(current_row == row && current_col == col) 
+                    && !knowledgeBase[current_row][current_col].getRevealed()
+                    && mineCells.contains(new Index(current_row, current_col))) {
+                    markedMines++;
+                }
+                current_col++;
+            }
+            current_row++;
+            current_col = start_col;
+        }
+
+        return markedMines;
+    }
+
+    /**
+     * Helper method to calculate the probability for a cell's neighbors.
+     * @param row
+     * @param col
+     * @return
+     */
+    private double calcProbability(int row, int col) {
+        // Count up number of marked mines around neighbor.
+        int markedMines = countMarkedMines(row, col);
+        int minesLeft = knowledgeBase[row][col].getClue() - (knowledgeBase[row][col].getNumMineCells() + markedMines);
+
+        // If there are mines left...
+        int hiddenCells = knowledgeBase[row][col].getNumHiddenCells();
+        int markedSafe = countMarkedSafe(row, col);
+        if(minesLeft > 0 && (hiddenCells -  (markedSafe + markedMines)) > 0) {
+            System.out.println(new Index(row, col) + " unknowns left = " + (hiddenCells - (markedSafe + markedMines)));
+            return (double)minesLeft / (double)(hiddenCells - (markedSafe + markedMines));
+        }
+
+        return 0;   // No mines left.
+    }
+
+    /**
+     * Helper method to update the probabilities for all of a cell's unrevealed neighbors.
+     * @param row
+     * @param col
+     */
+    public void updateCellProbability(int row, int col) {
+        Index index = new Index(row, col);
+
+        // No point to updating off of tripped mine.
+        if(knowledgeBase[row][col].getProbability() >= 1) {
+            return;
+        }
+
+        double prob = 0;
+        int dim = board.length;
+
+        // Expand from center.
+        int start_row = row - 1 >= 0 ? row - 1 : row;   // If expanding up is possible ...
+        int start_col = col - 1 >= 0 ? col - 1 : col;   // If expanding left is possible ...
+        int end_row = row + 1 < dim ? row + 1 : row;    // If expanding down is possible ...
+        int end_col = col + 1 < dim ? col + 1 : col;    // If expanding right is possible ...
+        int current_row = start_row;
+        int current_col = start_col;
+        while(current_row < end_row + 1) {
+            while(current_col < end_col + 1) {
+                // If not center, revealed, and not a mine:
+                if(!(current_row == row && current_col == col)
+                    && knowledgeBase[current_row][current_col].getRevealed()
+                    && knowledgeBase[current_row][current_col].getClue() >= 0) {
+                    double neighboringProb = knowledgeBase[current_row][current_col].getProbability();
+                    if(neighboringProb >= 0) {
+                        prob += neighboringProb;
+                    }
+                }
+                current_col++;
+            }
+            current_row++;
+            current_col = start_col;
+        }
+
+        // If cell is hidden:
+        if(!knowledgeBase[row][col].getRevealed()) {
+            if(prob == 0 && knowledgeBase[row][col].getProbability() != prob && !safeCells.contains(index)) {
+                safeCells.add(index);
+                System.out.println(index + " safe.");
+            } else {
+                knowledgeBase[row][col].setProbability(prob);
+                // System.out.println(new Index(row, col) + " probability = " + prob);
+                if(prob >= 1 && !mineCells.contains(index)) {
+                    mineCells.add(index);
+                    System.out.println(index + " unsafe.");
+                }
+            }
+        }
+    }
+
+    /**
+     * Helper method to update probabilties based off known cells.
+     */
+    public void updateAllKnownProbabilities() {
+        int dim = board.length;
+
+        // Update probabilities for neighbors of revealed cells.
+        for(int row = 0; row < dim; row++) {
+            for(int col = 0; col < dim; col++) {
+                if(knowledgeBase[row][col].getRevealed() && knowledgeBase[row][col].getClue() >= 0) {
+                    // System.out.println("Updating probability for " + new Index(row, col)); // DEBUG
+                    queryCell(row, col);
+                    knowledgeBase[row][col].setProbability(calcProbability(row, col));
+                    // System.out.println(new Index(row, col) + " probability = " + knowledgeBase[row][col].getProbability()); // DEBUG
+                }
+            }
+        }
+
+        //  Assign probabilities to unknown, unmarked cells.
+        for(int row = 0; row < dim; row++) {
+            for(int col = 0; col < dim; col++) {
+                Index index = new Index(row, col);
+                if(!knowledgeBase[row][col].getRevealed() && !safeCells.contains(index) && !mineCells.contains(index)) {
+                    updateCellProbability(row, col);
+                }
+            }
+        }
+    }
+
+    /**
+     * Helper method to get the score.
+     * @return mines correctly identified / total mines
+     */
+    public int calcScore() {
+        int score = 0;
+        for(int i = 0; i < mineCells.size(); i++) {
+            Index markedMine = mineCells.get(i);
+
+            if(board[markedMine.getRow()][markedMine.getCol()] == -1) {
+                score++;
+            }
+        }
+        return score;
+    }
+
+    /**
      * Getter method for agent's knowledgebase.
      * @return Agent's knowledgebase.
      */
-    public Cell[][] getKnowledgeBase() {
+    public ModifiedCell[][] getKnowledgeBase() {
         return knowledgeBase;
     }
 
