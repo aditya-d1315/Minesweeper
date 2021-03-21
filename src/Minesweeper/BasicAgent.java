@@ -244,6 +244,22 @@ public class BasicAgent {
     }
 
     /**
+     * Helper method to get the score.
+     * @return mines correctly identified / total mines
+     */
+    public int calcScore() {
+        int score = 0;
+        for(int i = 0; i < mineCells.size(); i++) {
+            Index markedMine = mineCells.get(i);
+
+            if(board[markedMine.getRow()][markedMine.getCol()] == -1) {
+                score++;
+            }
+        }
+        return score;
+    }
+    
+    /**
      * Getter method for agent's knowledgebase.
      * @return Agent's knowledgebase.
      */

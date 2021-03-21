@@ -76,27 +76,6 @@ public class Environment {
     }
 
     /**
-     * Helper method to determine if an Environment's board is completely mined.
-     * Counts the number of mines of the Environment's board and if it is equal to (dim * dim), there is no safe space.
-     * @return True if num_mines = (dim * dim). False otherwise.
-     */
-    private boolean completely_trapped() {
-        int num_mines = 0;
-        for(int row = 0; row < dim; row++) {
-            for(int col = 0; col < dim; col++) {
-                num_mines++;
-            }
-        }
-
-        // No safe space.
-        if(num_mines == (dim * dim)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Helper method to scatter mines on the board.
      * Could be used to add additional mines to a board, if necessary.
      * @param num_mines : The number of mines to put out.

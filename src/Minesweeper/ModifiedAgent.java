@@ -319,7 +319,7 @@ public class ModifiedAgent {
         int hiddenCells = knowledgeBase[row][col].getNumHiddenCells();
         int markedSafe = countMarkedSafe(row, col);
         if(minesLeft > 0 && (hiddenCells -  (markedSafe + markedMines)) > 0) {
-            System.out.println(new Index(row, col) + " unknowns left = " + (hiddenCells - (markedSafe + markedMines)));
+            // System.out.println(new Index(row, col) + " unknowns left = " + (hiddenCells - (markedSafe + markedMines))); // DEBUG
             return (double)minesLeft / (double)(hiddenCells - (markedSafe + markedMines));
         }
 
@@ -370,13 +370,13 @@ public class ModifiedAgent {
         if(!knowledgeBase[row][col].getRevealed()) {
             if(prob == 0 && knowledgeBase[row][col].getProbability() != prob && !safeCells.contains(index)) {
                 safeCells.add(index);
-                System.out.println(index + " safe.");
+                // System.out.println(index + " safe."); // DEBUG
             } else {
                 knowledgeBase[row][col].setProbability(prob);
                 // System.out.println(new Index(row, col) + " probability = " + prob);
                 if(prob >= 1 && !mineCells.contains(index)) {
                     mineCells.add(index);
-                    System.out.println(index + " unsafe.");
+                    // System.out.println(index + " unsafe."); // DEBUG
                 }
             }
         }
@@ -413,6 +413,7 @@ public class ModifiedAgent {
 
     /**
      * Helper method to get the score.
+     * Goes through list of marked mines and compares against the board.
      * @return mines correctly identified / total mines
      */
     public int calcScore() {
@@ -425,6 +426,23 @@ public class ModifiedAgent {
             }
         }
         return score;
+    }
+
+    /**
+     * Helper method to count number of cells falsely marked as a mine.
+     * Goes through list of marked mines and compares against the board.
+     * @return Number of cells falsely marked as mine.
+     */
+    public int calcFalsePositive() {
+        int falseMines = 0;
+        for(int i = 0; i < mineCells.size(); i++) {
+            Index markedMine = mineCells.get(i);
+
+            if(board[markedMine.getRow()][markedMine.getCol()] != -1) {
+                falseMines++;
+            }
+        }
+        return falseMines;
     }
 
     /**
