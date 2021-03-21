@@ -1,0 +1,126 @@
+% !TEX TS-program = pdflatex
+% !TEX encoding = UTF-8 Unicode
+
+% This is a simple template for a LaTeX document using the "article" class.
+% See "book", "report", "letter" for other types of document.
+
+\documentclass[11pt]{article} % use larger type; default would be 10pt
+
+\usepackage[utf8]{inputenc} % set input encoding (not needed with XeLaTeX)
+
+%%% Examples of Article customizations
+% These packages are optional, depending whether you want the features they provide.
+% See the LaTeX Companion or other references for full information.
+
+%%% PAGE DIMENSIONS
+\usepackage{geometry} % to change the page dimensions
+\geometry{a4paper} % or letterpaper (US) or a5paper or....
+% \geometry{margin=2in} % for example, change the margins to 2 inches all round
+% \geometry{landscape} % set up the page for landscape
+%   read geometry.pdf for detailed page layout information
+
+\usepackage{graphicx} % support the \includegraphics command and options
+
+% \usepackage[parfill]{parskip} % Activate to begin paragraphs with an empty line rather than an indent
+
+%%% PACKAGES
+\usepackage{booktabs} % for much better looking tables
+\usepackage{array} % for better arrays (eg matrices) in maths
+\usepackage{paralist} % very flexible & customisable lists (eg. enumerate/itemize, etc.)
+\usepackage{verbatim} % adds environment for commenting out blocks of text & for better verbatim
+\usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
+% These packages are all incorporated in the memoir class to one degree or another...
+
+%%% HEADERS & FOOTERS
+\usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
+\pagestyle{fancy} % options: empty , plain , fancy
+\renewcommand{\headrulewidth}{0pt} % customise the layout...
+\lhead{}\chead{}\rhead{}
+\lfoot{}\cfoot{\thepage}\rfoot{}
+
+%%% SECTION TITLE APPEARANCE
+\usepackage{sectsty}
+\allsectionsfont{\sffamily\mdseries\upshape} % (See the fntguide.pdf for font help)
+% (This matches ConTeXt defaults)
+
+%%% ToC (table of contents) APPEARANCE
+\usepackage[nottoc,notlof,notlot]{tocbibind} % Put the bibliography in the ToC
+\usepackage[titles,subfigure]{tocloft} % Alter the style of the Table of Contents
+\renewcommand{\cftsecfont}{\rmfamily\mdseries\upshape}
+\renewcommand{\cftsecpagefont}{\rmfamily\mdseries\upshape} % No bold!
+
+%%% END Article customizations
+
+%%% The "real" document content comes below...
+
+\title{\textbf{Project \#2: Minesweeper}}
+\author{Aditya Dhawan (Section \#3),  Annie Thach (Section \#6)}
+\date{} % Activate to display a given date or no date (if empty),
+         % otherwise the current date is printed 
+
+\begin{document}
+\maketitle
+
+\section{\textbf{Introduction}}
+
+\subsection{Statements}
+
+- /*All work shown in the following report and in related code files is entirely our own. No online work nor work done by other students were used in this project.*/ A.D., A.T. \\- Write-up done in LateX.
+
+\subsection{Contributions}
+
+- Coding: Aditya, Annie
+\\
+- Write-up: Aditya, Annie
+
+\section{\textbf{Questions}}
+
+\subsection{Representation}
+
+\textit{How did you represent the board in your program, and how did you represent the information / knowledge that clue cells reveal? How could you represent inferred relationships between cells?}\\
+
+The board itself is represented as an array of integers, where the numbers represent the state of the cells. -1 represents the mine and numbers greater than or equal to 0 are clues that tell the player how many mines are adjacent to the cell.\\
+
+The basic agent’s knowledge base is a parallel matrix that represents the board, but with a data structure to hold information about each cell. The Cell data structure tracks whether or not the cell has been revealed, the clue that was revealed (taken from the board when the agent decides to select the cell), the number of safe neighbors around the cell, the number mines revealed around the cell, and the number of hidden cells as well as the agent’s guess as to whether or not the cell is safe or a mine.\\
+
+In addition to the knowledge base the agent keeps a stack of safe cells to visit and a list of suspected mines to not visit. Cells that have been deemed safe using the knowledge base are represented with ‘s’ and suspected mines are represented by ‘m’.\\
+
+The improved agent selects cells with the highest probability of being safe. (WIP)
+
+\subsection{Inference}
+
+\textit{When you collect a new clue, how do you model / process / compute the information you gain from it? In other words, how do you update your current state of knowledge based on that clue? Does your program deduce everything it can from a given clue before continuing? If so, how can you be sure of this, and if not, how could you consider improving it?}\\
+
+Whenever a cell is selected, it then updates the probability values of the surrounding cells that have not yet been revealed, and from those values determines whether neighboring cells are either mines or safe. To represent this information, we make use of ArrayLists that update whenever a cell can be concluded as safe or as a mine. These ArrayLists hold the Index type, which is an abstract data type that holds information on the specific position of the cell. Essentially, before a cell is selected, the program checks to see if the ArrayList for safe cells contains anything to check first, that way the agent can step to those cells to clear more of the board and gain more clues. If in the case that there is nothing in the ArrayList for safe cells, the program will try to randomly select a position in the matrix, and will check against the ArrayList for cells that are suspected as mines in order to avoid them.\\
+
+TODO: Does the program deduce everything it can before proceeding?
+
+\subsection{Decisions}
+
+\textit{Given a current state of the board, and a state of knowledge about the board, how does your program decide which cell to search next?}\\
+
+Given the current state of the board, the program prioritizes selecting a cell that exists within the ArrayList for safe cells. If this is not the case, then the program will attempt to select a cell semi-randomly, while taking probabilities into account; the lower the probability that a cell is a mine, the more likely it is to be selected.
+
+\subsection{Performance}
+
+\textit{For a reasonably-sized board and a reasonable number of mines, include a play-by-play progression to completion or loss. Are there any points where your program makes a decision that you don’t agree with? Are there any points where your program made a decision that surprised you? Why was your program able to make that decision?}\\
+
+\subsection{Performance (cont.)}
+
+\textit{For a fixed, reasonable size of board, plot as a function of mine density the average final score (safely identified mines/total mines) for the simple baseline algorithm and your algorithm for comparison. This will require solving multiple random boards at a given density of mines to get good average score results. Does the graph make sense / agree with your intuition? When does minesweeper become “hard?” When does your algorithm beat the simple algorithm, and when is the simple algorithm better? Why? How frequently is your algorithm able to work out things that the basic agent cannot?}\\
+
+\subsection{Efficiency}
+
+\textit{What are some of the space or time constraints you run into in implementing this program? Are these problem specific constraints? In the case of implementation constraints, what could you improve upon?}\\
+
+\section{\textbf{Bonus Questions}}
+
+\subsection{Global Information}
+
+\textit{Suppose you were told in advance how many mines are on the board. Include this in your knowledge base. How did you model this? Regenerate the plot of mine density vs. average final score with this extra information, and analyze the results.}\\
+
+\subsection{Better Decisions}
+
+\textit{In both the basic and improved agent, when nothing more could be inferred, the agent selects a covered cell at random. Build a better mechanism. How can you justify it? Regenerate the plot of mine density vs. average final score with improved cell selection, and analyze the results.}\\
+
+\end{document}
