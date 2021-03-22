@@ -497,6 +497,8 @@ In essence, Minesweeper becomes "hard" once there are a lot more mines put on th
 
 \textit{What are some of the space or time constraints you run into in implementing this program? Are these problem specific constraints? In the case of implementation constraints, what could you improve upon?}\\
 
+Our worst case running time for our advanced agent is essentially O(n2) because of the fact that we are working with the board in a two-dimensional structure, and there can potentially be a scenario in which the agent will have to visit all cells. In addition, since we are using arrays to hold references for the cells to avoid and select, it can potentially become a significant space constraint if the board is very large, as it could potentially grow to hold a large number of mine references.\\
+
 \section{\textbf{Bonus Questions}}
 
 \subsection{Global Information}
