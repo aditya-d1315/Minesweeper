@@ -5,6 +5,10 @@ import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.Scanner;
 
+/**
+ * This class contains the terminal UI for Minesweeper.
+ * @author Aditya Dhawan, Annie Thach
+ */
 public class Main {
     private static Environment env = null;
     private static BasicAgent basicAgent = null;
@@ -86,8 +90,13 @@ public class Main {
                 basicAgent.queryCell(row, col);     // Query the cell for information.
 
                 System.out.println("Selected (" + row + ", " + col + "); " + basicAgent.getKnowledgeBase()[row][col]);
-                System.out.println("\tSafe cells: " + basicAgent.getSafeCells());
-                System.out.println("\tMine cells: " + basicAgent.getMineCells());
+                if(!basicAgent.getSafeCells().empty()) {
+                    System.out.println("Marked safe: " + basicAgent.getSafeCells());
+                }
+                
+                if(!basicAgent.getMineCells().isEmpty()) {
+                    System.out.println("Marked mines: " + basicAgent.getMineCells());
+                }
             }
 
             // Check score.
@@ -168,8 +177,13 @@ public class Main {
                 advancedAgent.updateAllKnownProbabilities();    // Update probabilities w/ new clue.
 
                 System.out.println("Selected (" + row + ", " + col + "); " + advancedAgent.getKnowledgeBase()[row][col]);
-                System.out.println("\tSafe cells: " + advancedAgent.getSafeCells());
-                System.out.println("\tMine cells: " + advancedAgent.getMineCells());
+                if(!advancedAgent.getSafeCells().isEmpty()) {
+                    System.out.println("Marked safe: " + advancedAgent.getSafeCells());
+                }
+
+                if(!advancedAgent.getMineCells().isEmpty()) {
+                    System.out.println("Marked mines: " + advancedAgent.getMineCells());
+                }
             }
     
             // Check score.
@@ -234,7 +248,7 @@ public class Main {
         // Generate a 16x16 board with 40 mines by default.
         env = new Environment(16, 40);
 
-        String commandsList = "'g' to generate new board.\n'b' to run basic agent.\n'a' to run advanced agent.\n'avg' to get the average scores of both agents for current board.\n'pb' to print the original board.\n'pkb' to print the basic agent's resulting knowledge base.\n'pka' to print the advanced agent's resulting knowledge base.\n'h' to bring this list up again.\n'q' to quit the program.";
+        String commandsList = "'g' to generate new board.\n'b' to run basic agent.\n'a' to run advanced agent.\n'avg' to get the average scores of both agents for current board.\n'pb' to print the original board.\n'pkb' to run and print the basic agent's resulting knowledge base.\n'pka' to run and print the advanced agent's resulting knowledge base.\n'h' to bring this list up again.\n'q' to quit the program.";
 
         System.out.println("Welcome to Minesweeper!");
         System.out.println("The commands are as follows:");
@@ -244,7 +258,7 @@ public class Main {
 
         while(true) {
             System.out.print("Enter a command: ");
-            cmd = sc.nextLine();
+            cmd = sc.nextLine().trim();
     
             if(cmd.equalsIgnoreCase("q")) {
                 System.out.println("Quitting...");
@@ -265,17 +279,17 @@ public class Main {
             } else if(cmd.equalsIgnoreCase("pb")) {
                 System.out.println("Original board:\n" + env);
             } else if(cmd.equalsIgnoreCase("pkb")) {
-                if(basicAgent == null) {
-                    runBasicAgent();
-                }
+                runBasicAgent();
                 System.out.println("Basic agent's knowledge base:\n" + basicAgent);
-                System.out.println("The basic agent scored: " + basicAgent.calcScore() + " / " + env.getNum_mines());
+                System.out.println("Number of mines marked: " + basicAgent.getMineCells().size());
+                // System.out.println("The basic agent scored: " + basicAgent.calcScore() + " / " + env.getNum_mines());
             } else if(cmd.equalsIgnoreCase("pka")) {
-                if(advancedAgent == null) {
-                    runAdvancedAgent();
-                }
+                runAdvancedAgent();
+
                 System.out.println("Advanced agent's knowledge base:\n" + advancedAgent);
-                System.out.println("The advanced agent scored: " + advancedAgent.calcScore() + " / " + env.getNum_mines());
+                // System.out.println("The advanced agent scored: " + advancedAgent.calcScore() + " / " + env.getNum_mines());
+                System.out.println("Number of mines marked: " + advancedAgent.getMineCells().size());
+                System.out.println("Number of safe cells falsely marked as mine: " + advancedAgent.calcFalsePositive());
             } else if(cmd.equalsIgnoreCase("h")) {
                 System.out.println(commandsList);
             } else {

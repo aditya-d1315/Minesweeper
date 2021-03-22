@@ -4,6 +4,7 @@ import java.util.Comparator;
 
 /**
  * Abstract data type for holding the coordinates for a position in the board.
+ * @author Aditya Dhawan, Annie Thach
  */
 public class Index implements Comparable<Index>, Comparator<Index> {
     private int row;
