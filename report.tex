@@ -509,10 +509,12 @@ Given the number of mines left on the board, we could better calculate the risk 
 
 \textit{In both the basic and improved agent, when nothing more could be inferred, the agent selects a covered cell at random. Build a better mechanism. How can you justify it? Regenerate the plot of mine density vs. average final score with improved cell selection, and analyze the results.}\\
 
+In addition to selecting low risk cells using probability, we could try and prioritize selecting cells on the inside first, then cells on the edges, then cells in the corner. The three types of cells have eight neighbors, five neighbors, then three neighbors respectively, and the lower the number of neighbors, the higher the odds of tripping a mine and we get less information about safe cells as well. Corners are high risk, low reward compared to inner cells. The more information we can obtain, the faster we can “expand” the frontier before we have to resort to randomness.
+
 \begin{center}
 \includegraphics*[scale=0.5]{plot2.png}\\
 \end{center}
 
-In addition to selecting low risk cells using probability, we could try and prioritize selecting cells on the inside first, then cells on the edges, then cells in the corner. The three types of cells have eight neighbors, five neighbors, then three neighbors respectively, and the lower the number of neighbors, the higher the odds of tripping a mine and we get less information about safe cells as well. Corners are high risk, low reward compared to inner cells. The more information we can obtain, the faster we can “expand” the frontier before we have to resort to randomness.
+Overall, it does not seem to affect the score by too much; sometimes better, sometimes worse, but still very much random as the score ranges around what the original cell selection heuristic was, which was pretty much random.
 
 \end{document}
