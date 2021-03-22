@@ -109,6 +109,14 @@ Given the current state of the board and knowledge about the board, the program 
 
 \textit{For a fixed, reasonable size of board, plot as a function of mine density the average final score (safely identified mines/total mines) for the simple baseline algorithm and your algorithm for comparison. This will require solving multiple random boards at a given density of mines to get good average score results. Does the graph make sense / agree with your intuition? When does minesweeper become “hard?” When does your algorithm beat the simple algorithm, and when is the simple algorithm better? Why? How frequently is your algorithm able to work out things that the basic agent cannot?}\\
 
+\begin{center}
+	\includegraphics*[scale=0.5]{plot.png}\\
+\end{center}
+
+This graph agrees with what we expect. When the mine density is fairly low, the strong inferences that the advanced agent makes allows it to sidestep mines easily, which leads to a score higher than the basic agent. On the other hand, as the mine density increases, the advanced agent becomes on par with the basic agent because even though the advanced agent can make stronger inferences and use probability to its advantage, at the end of the day there are only so many places that it can step to, meaning that it will have as many choices to step towards as the basic agent. Judging by the difference in the two trends in their early stages, the advanced agent is able to outperform the basic agent, and seems to have a slight edge even at higher mine densities. According to the trends, the basic agent never outperforms our algorithm, but can potentially be on par.\\
+
+In essence, Minesweeper becomes "hard" once there are a lot more mines put on the board. Both the basic and advanced agent will struggle in these environments, as both will inevitably tread over a greater number of mines. The more of them there are, the less safe spots there are to find and make inferences off of.\\
+
 \subsection{Efficiency}
 
 \textit{What are some of the space or time constraints you run into in implementing this program? Are these problem specific constraints? In the case of implementation constraints, what could you improve upon?}\\
