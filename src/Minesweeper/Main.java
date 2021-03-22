@@ -145,6 +145,7 @@ public class Main {
     
                     // If heap is empty (no cells with probabilities < 0.5):
                     if(unprocessedKnown.isEmpty()) {
+                        /*
                         // Build a list of unprocessed cells.
                         ArrayList<Index> unprocessed = new ArrayList<Index>();
                         for(int i = 0; i < knowledgeBase.length; i++) {
@@ -155,6 +156,62 @@ public class Main {
                                 }
                             }
                         }
+                        */
+
+                        
+                        // Comment out above! This bit is for prioritizing inner cell > edge cells > corner cells.
+                        // Build a list of inner cells to process.
+                        ArrayList<Index> unprocessed = new ArrayList<Index>();
+
+                        for(int i = 0; i < knowledgeBase.length; i++) {
+                            for(int j = 0; j < knowledgeBase.length; j++) {
+                                Index index = new Index(i, j);
+                                if(!knowledgeBase[i][j].getRevealed()
+                                    && !mineCells.contains(index)
+                                    && (i != 0 && j != 0 && i != knowledgeBase.length - 1 && j != knowledgeBase.length - 1)) {
+                                        unprocessed.add(index);
+                                }
+                            }
+                        }
+
+                        // Build a list of edge cells to process.
+                        if(unprocessed.isEmpty()) {
+                            for(int i = 0; i < knowledgeBase.length; i++) {
+                                for(int j = 0; j < knowledgeBase.length; j++) {
+                                    Index index = new Index(i, j);
+                                    if(!knowledgeBase[i][j].getRevealed()
+                                        && !mineCells.contains(index)
+                                        && (!((i == 0 && j == 0) || (i == 0 && j == knowledgeBase.length - 1) || (i == knowledgeBase.length && j == 0) || (i == knowledgeBase.length && j == knowledgeBase.length)))) {
+                                            unprocessed.add(index);
+                                    }
+                                }
+                            }
+                        }
+
+                        // Build a list of corner cells to process.
+                        if(unprocessed.isEmpty()) {
+                            Index topLeft = new Index(0, 0);
+                            Index topRight = new Index(0, knowledgeBase.length - 1);
+                            Index bottomLeft = new Index(knowledgeBase.length - 1, 0);
+                            Index bottomRight = new Index(knowledgeBase.length - 1, knowledgeBase.length - 1);
+
+                            if(!knowledgeBase[0][0].getRevealed() && !mineCells.contains(topLeft)) {
+                                unprocessed.add(topLeft);
+                            }
+
+                            if(!knowledgeBase[0][knowledgeBase.length - 1].getRevealed() && !mineCells.contains(topRight)) {
+                                unprocessed.add(topRight);
+                            }
+
+                            if(!knowledgeBase[knowledgeBase.length - 1][0].getRevealed() && !mineCells.contains(bottomLeft)) {
+                                unprocessed.add(bottomLeft);
+                            }
+
+                            if(!knowledgeBase[knowledgeBase.length - 1][knowledgeBase.length - 1].getRevealed() && !mineCells.contains(bottomRight)) {
+                                unprocessed.add(bottomRight);
+                            }
+                        }
+                        
                     
                         // If the list is empty, then there is nothing left to process.
                         if(unprocessed.isEmpty()) {
@@ -295,6 +352,7 @@ public class Main {
             } else {
                 System.out.println("Invalid command! Type 'h' for a list of valid commands.");
             }
+            
             System.out.println();
         }
 
