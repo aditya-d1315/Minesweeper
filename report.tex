@@ -29,6 +29,7 @@
 \usepackage{paralist} % very flexible & customisable lists (eg. enumerate/itemize, etc.)
 \usepackage{verbatim} % adds environment for commenting out blocks of text & for better verbatim
 \usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
+\usepackage{amsmath}
 % These packages are all incorporated in the memoir class to one degree or another...
 
 %%% HEADERS & FOOTERS
@@ -73,6 +74,25 @@
 \\
 - Write-up: Aditya, Annie
 
+\subsection{About}
+
+This program was done in Java.\\
+To compile, go to the source directory, “src”, and type into the terminal:\\
+\textbf{javac Minesweeper/Main.java}\\
+To run this program, while in the source directory, type into the terminal:\\
+\textbf{java Minesweeper.Main}\\
+The user will then be presented with a list of commands and prompted to input commands. The commands are as follows:\\
+'g' to generate new board.\\
+'b' to run basic agent.\\
+'a' to run advanced agent.\\
+'avg' to get the average scores of both agents for the current board.\\
+'pb' to print the original board.\\
+'pkb' to print the basic agent's resulting knowledge base.\\
+'pka' to print the advanced agent's resulting knowledge base.\\
+'h' to bring this list up again.\\
+'q' to quit the program.\\
+
+
 \section{\textbf{Questions}}
 
 \subsection{Representation}
@@ -105,6 +125,362 @@ Given the current state of the board and knowledge about the board, the program 
 
 \textit{For a reasonably-sized board and a reasonable number of mines, include a play-by-play progression to completion or loss. Are there any points where your program makes a decision that you don’t agree with? Are there any points where your program made a decision that surprised you? Why was your program able to make that decision?}\\
 
+\begin{center}
+\textbf{Original 10 x 10 board:}\\
+$\begin{matrix}
+-1 & 2 & 0 & 1 & -1 & 3 & -1 & 3 & 1 & 1\\
+-1 & 3 & 0 & 1 & 1 & 3 & -1 & 3 & -1 & 1\\
+-1 & 3 & 0 & 0 & 0 & 1 & 1 & 2 & 1 & 1\\
+-1 & 2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+1 & 1 & 0 & 0 & 0 & 1 & 1 & 1 & 0 & 0\\
+0 & 0 & 1 & 1 & 1 & 1 & -1 & 1 & 0 & 0\\
+0 & 0 & 2 & -1 & 2 & 1 & 1 & 1 & 0 & 0\\
+1 & 2 & 4 & -1 & 3 & 2 & 2 & 2 & 1 & 1\\
+1 & -1 & -1 & 2 & 2 & -1 & -1 & 2 & -1 & 1\\
+1 & 2 & 2 & 1 & 1 & 2 & 2 & 2 & 1 & 1
+\end{matrix}$
+
+\textbf{Basic agent's knowledge base:}\\
+$\begin{matrix}
+m & 2 & 0 & 1 & -1 & 3 & -1 & 3 & 1 & 1\\
+m & 3 & 0 & 1 & 1 & 3 & -1 & 3 & m & 1\\
+m & 3 & 0 & 0 & 0 & 1 & 1 & 2 & 1 & 1\\
+m & 2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+1 & 1 & 0 & 0 & 0 & 1 & 1 & 1 & 0 & 0\\
+0 & 0 & 1 & 1 & 1 & 1 & -1 & 1 & 0 & 0\\
+0 & 0 & 2 & -1 & 2 & 1 & 1 & 1 & 0 & 0\\
+1 & 2 & 4 & -1 & 3 & 2 & 2 & 2 & 1 & 1\\
+1 & m & -1 & 2 & 2 & -1 & m & 2 & -1 & 1\\
+1 & 2 & 2 & 1 & 1 & 2 & 2 & 2 & 1 & 1
+\end{matrix}$
+
+\textbf{Advanced agent's knowledge base:}\\
+$\begin{matrix}
+m & 2 & 0 & 1 & m & 3 & -1 & 3 & 1 & 1\\
+m & 3 & 0 & 1 & 1 & 3 & -1 & 3 & m & 1\\
+m & 3 & 0 & 0 & 0 & 1 & 1 & 2 & 1 & 1\\
+m & 2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+1 & 1 & 0 & 0 & 0 & 1 & 1 & 1 & 0 & 0\\
+0 & 0 & 1 & 1 & 1 & 1 & m & 1 & 0 & 0\\
+0 & 0 & 2 & m & 2 & 1 & 1 & 1 & 0 & 0\\
+1 & 2 & 4 & m & 3 & 2 & 2 & 2 & 1 & 1\\
+1 & m & m & m & 2 & m & m & 2 & m & 1\\
+1 & 2 & 2 & 1 & 1 & 2 & 2 & 2 & 1 & 1
+\end{matrix}$
+\end{center}
+
+\textbf{Basic Agent Play-By-Play}\\
+Selected (7, 0); revealed safe (1), 0 safe neighbors, 0 mines, 5 hidden neighbors, unknown\\
+Selected (4, 8); revealed safe (0), 0 safe neighbors, 0 mines, 8 hidden neighbors, unknown\\
+Safe cells: [(3, 7), (3, 8), (3, 9), (4, 7), (4, 9), (5, 7), (5, 8), (5, 9)]\\
+Selected (5, 9); revealed safe (0), 1 safe neighbors, 0 mines, 4 hidden neighbors, probably safe\\
+Safe cells: [(3, 7), (3, 8), (3, 9), (4, 7), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9)]\\
+Selected (6, 9); revealed safe (0), 1 safe neighbors, 0 mines, 4 hidden neighbors, probably safe\\
+Safe cells: [(3, 7), (3, 8), (3, 9), (4, 7), (4, 9), (5, 7), (5, 8), (6, 8), (7, 8), (7, 9)]\\
+Selected (7, 9); revealed safe (1), 1 safe neighbors, 0 mines, 4 hidden neighbors, probably safe\\
+Safe cells: [(3, 7), (3, 8), (3, 9), (4, 7), (4, 9), (5, 7), (5, 8), (6, 8), (7, 8)]\\
+Selected (7, 8); revealed safe (1), 2 safe neighbors, 0 mines, 6 hidden neighbors, unknown\\
+Safe cells: [(3, 7), (3, 8), (3, 9), (4, 7), (4, 9), (5, 7), (5, 8), (6, 8)]\\
+Selected (6, 8); revealed safe (0), 4 safe neighbors, 0 mines, 4 hidden neighbors, unknown\\
+Safe cells: [(3, 7), (3, 8), (3, 9), (4, 7), (4, 9), (5, 7), (5, 8), (6, 7), (7, 7)]\\
+Selected (7, 7); revealed safe (2), 2 safe neighbors, 0 mines, 6 hidden neighbors, probably safe\\
+Safe cells: [(3, 7), (3, 8), (3, 9), (4, 7), (4, 9), (5, 7), (5, 8), (6, 7)]\\
+Selected (6, 7); revealed safe (1), 3 safe neighbors, 0 mines, 5 hidden neighbors, unknown\\
+Safe cells: [(3, 7), (3, 8), (3, 9), (4, 7), (4, 9), (5, 7), (5, 8)]\\
+Selected (5, 8); revealed safe (0), 5 safe neighbors, 0 mines, 3 hidden neighbors, unknown\\
+Safe cells: [(3, 7), (3, 8), (3, 9), (4, 7), (4, 9), (5, 7)]\\
+Selected (5, 7); revealed safe (1), 4 safe neighbors, 0 mines, 4 hidden neighbors, probably safe\\
+Safe cells: [(3, 7), (3, 8), (3, 9), (4, 7), (4, 9)]\\
+Selected (4, 9); revealed safe (0), 3 safe neighbors, 0 mines, 2 hidden neighbors, probably safe\\
+Safe cells: [(3, 7), (3, 8), (3, 9), (4, 7)]\\
+Selected (4, 7); revealed safe (1), 3 safe neighbors, 0 mines, 5 hidden neighbors, unknown\\
+Safe cells: [(3, 7), (3, 8), (3, 9)]\\
+Selected (3, 9); revealed safe (0), 2 safe neighbors, 0 mines, 3 hidden neighbors, probably safe\\
+Safe cells: [(3, 7), (3, 8), (2, 8), (2, 9)]\\
+Selected (2, 9); revealed safe (1), 1 safe neighbors, 0 mines, 4 hidden neighbors, probably safe\\
+Safe cells: [(3, 7), (3, 8), (2, 8)]\\
+Selected (2, 8); revealed safe (1), 2 safe neighbors, 0 mines, 6 hidden neighbors, unknown\\
+Safe cells: [(3, 7), (3, 8)]\\
+Selected (3, 8); revealed safe (0), 6 safe neighbors, 0 mines, 2 hidden neighbors, unknown\\
+Safe cells: [(3, 7), (2, 7)]\\
+Selected (2, 7); revealed safe (2), 2 safe neighbors, 0 mines, 6 hidden neighbors, probably safe\\
+Safe cells: [(3, 7)]\\
+Selected (3, 7); revealed safe (0), 5 safe neighbors, 0 mines, 3 hidden neighbors, unknown\\
+Safe cells: [(2, 6), (3, 6), (4, 6)]\\
+Selected (4, 6); revealed safe (1), 3 safe neighbors, 0 mines, 5 hidden neighbors, probably safe\\
+Safe cells: [(2, 6), (3, 6)]\\
+Selected (3, 6); revealed safe (0), 4 safe neighbors, 0 mines, 4 hidden neighbors, unknown\\
+Safe cells: [(2, 6), (2, 5), (3, 5), (4, 5)]\\
+Selected (4, 5); revealed safe (1), 2 safe neighbors, 0 mines, 6 hidden neighbors, probably safe\\
+Safe cells: [(2, 6), (2, 5), (3, 5)]\\
+Selected (3, 5); revealed safe (0), 3 safe neighbors, 0 mines, 5 hidden neighbors, unknown\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (4, 4)]\\
+Selected (4, 4); revealed safe (0), 2 safe neighbors, 0 mines, 6 hidden neighbors, probably safe\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3), (4, 3), (5, 3), (5, 4), (5, 5)]\\
+Selected (5, 5); revealed safe (1), 3 safe neighbors, 0 mines, 5 hidden neighbors, probably safe\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3), (4, 3), (5, 3), (5, 4)]\\
+Selected (5, 4); revealed safe (1), 3 safe neighbors, 0 mines, 5 hidden neighbors, unknown\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3), (4, 3), (5, 3)]\\
+Selected (5, 3); revealed safe (1), 2 safe neighbors, 0 mines, 6 hidden neighbors, unknown\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3), (4, 3)]\\
+Selected (4, 3); revealed safe (0), 3 safe neighbors, 0 mines, 5 hidden neighbors, unknown\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3), (3, 2), (4, 2), (5, 2)]\\
+Selected (5, 2); revealed safe (1), 2 safe neighbors, 0 mines, 6 hidden neighbors, probably safe\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3), (3, 2), (4, 2)]\\
+Selected (4, 2); revealed safe (0), 3 safe neighbors, 0 mines, 5 hidden neighbors, unknown\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3), (3, 2), (3, 1), (4, 1), (5, 1)]\\
+Selected (5, 1); revealed safe (0), 2 safe neighbors, 0 mines, 6 hidden neighbors, probably safe\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3), (3, 2), (3, 1), (4, 1), (4, 0), (5, 0), (6, 0), (6, 1), (6, 2)]\\
+Selected (6, 2); revealed safe (2), 3 safe neighbors, 0 mines, 5 hidden neighbors, probably safe\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3), (3, 2), (3, 1), (4, 1), (4, 0), (5, 0), (6, 0), (6, 1)]\\
+Selected (6, 1); revealed safe (0), 4 safe neighbors, 0 mines, 4 hidden neighbors, unknown\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3), (3, 2), (3, 1), (4, 1), (4, 0), (5, 0), (6, 0), (7, 1), (7, 2)]\\
+Selected (7, 2); revealed safe (4), 2 safe neighbors, 0 mines, 6 hidden neighbors, probably safe\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3), (3, 2), (3, 1), (4, 1), (4, 0), (5, 0), (6, 0), (7, 1)]\\
+Selected (7, 1); revealed safe (2), 4 safe neighbors, 0 mines, 4 hidden neighbors, unknown\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3), (3, 2), (3, 1), (4, 1), (4, 0), (5, 0), (6, 0)]\\
+Selected (6, 0); revealed safe (0), 4 safe neighbors, 0 mines, 1 hidden neighbors, unknown\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3), (3, 2), (3, 1), (4, 1), (4, 0), (5, 0)]\\
+Selected (5, 0); revealed safe (0), 3 safe neighbors, 0 mines, 2 hidden neighbors, probably safe\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3), (3, 2), (3, 1), (4, 1), (4, 0)]\\
+Selected (4, 0); revealed safe (1), 2 safe neighbors, 0 mines, 3 hidden neighbors, probably safe\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3), (3, 2), (3, 1), (4, 1)]\\
+Selected (4, 1); revealed safe (1), 5 safe neighbors, 0 mines, 3 hidden neighbors, unknown\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3), (3, 2), (3, 1)]\\
+Selected (3, 1); revealed safe (2), 3 safe neighbors, 0 mines, 5 hidden neighbors, unknown\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3), (3, 2)]\\
+Selected (3, 2); revealed safe (0), 4 safe neighbors, 0 mines, 4 hidden neighbors, unknown\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3), (2, 1), (2, 2), (2, 3)]\\
+Selected (2, 3); revealed safe (0), 1 safe neighbors, 0 mines, 7 hidden neighbors, probably safe\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3), (2, 1), (2, 2), (1, 2), (1, 3), (1, 4)]\\
+Selected (1, 4); revealed safe (1), 1 safe neighbors, 0 mines, 7 hidden neighbors, probably safe\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3), (2, 1), (2, 2), (1, 2), (1, 3)]\\
+Selected (1, 3); revealed safe (1), 2 safe neighbors, 0 mines, 6 hidden neighbors, unknown\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3), (2, 1), (2, 2), (1, 2)]\\
+Selected (1, 2); revealed safe (0), 2 safe neighbors, 0 mines, 6 hidden neighbors, unknown\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3), (2, 1), (2, 2), (0, 1), (0, 2), (0, 3), (1, 1)]\\
+Selected (1, 1); revealed safe (3), 1 safe neighbors, 0 mines, 7 hidden neighbors, probably safe\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3), (2, 1), (2, 2), (0, 1), (0, 2), (0, 3)]\\
+Selected (0, 3); revealed safe (1), 3 safe neighbors, 0 mines, 2 hidden neighbors, probably safe\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3), (2, 1), (2, 2), (0, 1), (0, 2)]\\
+Selected (0, 2); revealed safe (0), 4 safe neighbors, 0 mines, 1 hidden neighbors, unknown\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3), (2, 1), (2, 2), (0, 1)]\\
+Selected (0, 1); revealed safe (2), 3 safe neighbors, 0 mines, 2 hidden neighbors, probably safe\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3), (2, 1), (2, 2)]\\
+Selected (2, 2); revealed safe (0), 6 safe neighbors, 0 mines, 2 hidden neighbors, unknown\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3), (2, 1)]\\
+Selected (2, 1); revealed safe (3), 5 safe neighbors, 0 mines, 3 hidden neighbors, probably safe\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4), (3, 3)]\\
+Selected (3, 3); revealed safe (0), 6 safe neighbors, 0 mines, 2 hidden neighbors, probably safe\\
+Safe cells: [(2, 6), (2, 5), (2, 4), (3, 4)]\\
+Selected (3, 4); revealed safe (0), 6 safe neighbors, 0 mines, 2 hidden neighbors, probably safe\\
+Safe cells: [(2, 6), (2, 5), (2, 4)]\\
+Selected (2, 4); revealed safe (0), 6 safe neighbors, 0 mines, 2 hidden neighbors, probably safe\\
+Safe cells: [(2, 6), (2, 5), (1, 5)]\\
+Selected (1, 5); revealed safe (3), 2 safe neighbors, 0 mines, 6 hidden neighbors, probably safe\\
+Safe cells: [(2, 6), (2, 5)]\\
+Selected (2, 5); revealed safe (1), 6 safe neighbors, 0 mines, 2 hidden neighbors, unknown\\
+Safe cells: [(2, 6)]\\
+Selected (2, 6); revealed safe (1), 6 safe neighbors, 0 mines, 2 hidden neighbors, unknown\\
+Selected (0, 8); revealed safe (1), 0 safe neighbors, 0 mines, 5 hidden neighbors, unknown\\
+Selected (6, 5); revealed safe (1), 2 safe neighbors, 0 mines, 6 hidden neighbors, unknown\\
+Selected (8, 7); revealed safe (2), 2 safe neighbors, 0 mines, 6 hidden neighbors, unknown\\
+Selected (1, 7); revealed safe (3), 4 safe neighbors, 0 mines, 4 hidden neighbors, unknown\\
+Selected (0, 9); revealed safe (1), 1 safe neighbors, 0 mines, 2 hidden neighbors, unknown\\
+Selected (9, 1); revealed safe (2), 0 safe neighbors, 0 mines, 5 hidden neighbors, unknown\\
+Selected (7, 4); revealed safe (3), 1 safe neighbors, 0 mines, 7 hidden neighbors, unknown\\
+Selected (9, 0); revealed safe (1), 1 safe neighbors, 0 mines, 2 hidden neighbors, unknown\\
+Selected (8, 8); revealed mine, 4 safe neighbors, 0 mines, 4 hidden neighbors, unknown\\
+Selected (8, 0); revealed safe (1), 4 safe neighbors, 0 mines, 1 hidden neighbors, unknown\\
+Selected (9, 4); revealed safe (1), 0 safe neighbors, 0 mines, 5 hidden neighbors, unknown\\
+Selected (9, 6); revealed safe (2), 1 safe neighbors, 0 mines, 4 hidden neighbors, unknown\\
+Selected (1, 6); revealed mine, 5 safe neighbors, 0 mines, 3 hidden neighbors, unknown\\
+Selected (6, 6); revealed safe (1), 5 safe neighbors, 0 mines, 3 hidden neighbors, unknown\\
+Selected (8, 4); revealed safe (2), 2 safe neighbors, 0 mines, 6 hidden neighbors, unknown\\
+Selected (8, 5); revealed mine, 4 safe neighbors, 0 mines, 4 hidden neighbors, unknown\\
+Selected (0, 6); revealed mine, 2 safe neighbors, 1 mines, 2 hidden neighbors, unknown\\
+Selected (0, 4); revealed mine, 4 safe neighbors, 0 mines, 1 hidden neighbors, unknown\\
+Selected (0, 5); revealed safe (3), 2 safe neighbors, 3 mines, 0 hidden neighbors, unknown\\
+Selected (1, 9); revealed safe (1), 4 safe neighbors, 0 mines, 1 hidden neighbors, unknown\\
+Selected (9, 2); revealed safe (2), 1 safe neighbors, 0 mines, 4 hidden neighbors, unknown\\
+Selected (5, 6); revealed mine, 8 safe neighbors, 0 mines, 0 hidden neighbors, unknown\\
+Selected (6, 3); revealed mine, 6 safe neighbors, 0 mines, 2 hidden neighbors, unknown\\
+Selected (7, 6); revealed safe (2), 5 safe neighbors, 1 mines, 2 hidden neighbors, unknown\\
+Selected (7, 5); revealed safe (2), 5 safe neighbors, 1 mines, 2 hidden neighbors, unknown\\
+Selected (9, 5); revealed safe (2), 3 safe neighbors, 1 mines, 1 hidden neighbors, unknown\\
+Selected (8, 2); revealed mine, 4 safe neighbors, 0 mines, 4 hidden neighbors, unknown\\
+Selected (9, 7); revealed safe (2), 2 safe neighbors, 1 mines, 2 hidden neighbors, unknown\\
+Selected (7, 3); revealed mine, 4 safe neighbors, 2 mines, 2 hidden neighbors, unknown\\
+Selected (0, 7); revealed safe (3), 2 safe neighbors, 2 mines, 1 hidden neighbors, unknown\\
+Selected (9, 3); revealed safe (1), 3 safe neighbors, 1 mines, 1 hidden neighbors, unknown\\
+Safe cells: [(8, 3)]\\
+Selected (8, 3); revealed safe (2), 6 safe neighbors, 2 mines, 0 hidden neighbors, probably safe\\
+Selected (9, 9); revealed safe (1), 0 safe neighbors, 1 mines, 2 hidden neighbors, unknown\\
+Safe cells: [(8, 9), (9, 8)]\\
+Selected (9, 8); revealed safe (1), 3 safe neighbors, 1 mines, 1 hidden neighbors, probably safe\\
+Safe cells: [(8, 9)]\\
+Selected (8, 9); revealed safe (1), 4 safe neighbors, 1 mines, 0 hidden neighbors, probably safe\\
+Selected (6, 4); revealed safe (2), 6 safe neighbors, 2 mines, 0 hidden neighbors, unknown\\
+Mine cells: [(0, 0), (1, 0), (2, 0), (3, 0), (8, 1), (1, 8), (8, 6)]\\
+The basic agent scored: 7 / 16\\
+
+\textbf{Advanced Agent Play-By-Play:}\\
+Selected (0, 6); revealed mine, 0 safe neighbors, 0 mines, 5 hidden neighbors, unknown\\
+Selected (2, 5); revealed safe (1), 0 safe neighbors, 0 mines, 8 hidden neighbors, unknown\\
+Selected (1, 4); revealed safe (1), 1 safe neighbors, 0 mines, 7 hidden neighbors, unknown\\
+Selected (0, 3); revealed safe (1), 1 safe neighbors, 0 mines, 4 hidden neighbors, unknown\\
+Selected (1, 6); revealed mine, 1 safe neighbors, 1 mines, 6 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (3, 6)]\\
+Selected (3, 6); revealed safe (0), 1 safe neighbors, 0 mines, 7 hidden neighbors, probably safe\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (3, 7), (4, 5), (4, 6), (4, 7)]\\
+Selected (4, 7); revealed safe (1), 1 safe neighbors, 0 mines, 7 hidden neighbors, probably safe\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (3, 7), (4, 5), (4, 6)]\\
+Selected (4, 6); revealed safe (1), 2 safe neighbors, 0 mines, 6 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (3, 7), (4, 5)]\\
+Selected (4, 5); revealed safe (1), 2 safe neighbors, 0 mines, 6 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (3, 7)]\\
+Selected (3, 7); revealed safe (0), 3 safe neighbors, 0 mines, 5 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (4, 8)]\\
+Selected (4, 8); revealed safe (0), 2 safe neighbors, 0 mines, 6 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (5, 9)]\\
+Selected (5, 9); revealed safe (0), 1 safe neighbors, 0 mines, 4 hidden neighbors, probably safe\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (4, 4), (5, 4), (5, 5)]\\
+Selected (5, 5); revealed safe (1), 2 safe neighbors, 0 mines, 6 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (4, 4), (5, 4)]\\
+Selected (5, 4); revealed safe (1), 2 safe neighbors, 0 mines, 6 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (4, 4)]\\
+Selected (4, 4); revealed safe (0), 3 safe neighbors, 0 mines, 5 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (4, 3), (5, 3)]\\
+Selected (5, 3); revealed safe (1), 2 safe neighbors, 0 mines, 6 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (4, 3)]\\
+Selected (4, 3); revealed safe (0), 3 safe neighbors, 0 mines, 5 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (3, 2), (4, 2), (5, 2)]\\
+Selected (5, 2); revealed safe (1), 2 safe neighbors, 0 mines, 6 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (3, 2), (4, 2)]\\
+Selected (4, 2); revealed safe (0), 3 safe neighbors, 0 mines, 5 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (3, 2), (3, 1), (4, 1), (5, 1)]\\
+Selected (5, 1); revealed safe (0), 2 safe neighbors, 0 mines, 6 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (3, 2), (3, 1), (4, 1), (4, 0), (5, 0), (6, 0), (6, 1), (6, 2), (6, 4), (6, 5)]\\
+Selected (6, 5); revealed safe (1), 2 safe neighbors, 0 mines, 6 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (3, 2), (3, 1), (4, 1), (4, 0), (5, 0), (6, 0), (6, 1), (6, 2), (6, 4)]\\
+Selected (6, 4); revealed safe (2), 4 safe neighbors, 0 mines, 4 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (3, 2), (3, 1), (4, 1), (4, 0), (5, 0), (6, 0), (6, 1), (6, 2)]\\
+Selected (6, 2); revealed safe (2), 3 safe neighbors, 0 mines, 5 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (3, 2), (3, 1), (4, 1), (4, 0), (5, 0), (6, 0), (6, 1)]\\
+Selected (6, 1); revealed safe (0), 3 safe neighbors, 0 mines, 5 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (3, 2), (3, 1), (4, 1), (4, 0), (5, 0), (6, 0), (7, 0), (7, 1), (7, 2)]\\
+Selected (7, 2); revealed safe (4), 2 safe neighbors, 0 mines, 6 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (3, 2), (3, 1), (4, 1), (4, 0), (5, 0), (6, 0), (7, 0), (7, 1), (7, 4), (7, 5)]\\
+Selected (7, 5); revealed safe (2), 2 safe neighbors, 0 mines, 6 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (3, 2), (3, 1), (4, 1), (4, 0), (5, 0), (6, 0), (7, 0), (7, 1), (7, 4)]\\
+Selected (7, 4); revealed safe (3), 3 safe neighbors, 0 mines, 5 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (3, 2), (3, 1), (4, 1), (4, 0), (5, 0), (6, 0), (7, 0), (7, 1)]\\
+Selected (7, 1); revealed safe (2), 3 safe neighbors, 0 mines, 5 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (3, 2), (3, 1), (4, 1), (4, 0), (5, 0), (6, 0), (7, 0)]\\
+Selected (7, 0); revealed safe (1), 2 safe neighbors, 0 mines, 3 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (3, 2), (3, 1), (4, 1), (4, 0), (5, 0), (6, 0), (8, 0)]\\
+Selected (8, 0); revealed safe (1), 2 safe neighbors, 0 mines, 3 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (3, 2), (3, 1), (4, 1), (4, 0), (5, 0), (6, 0)]\\
+Selected (6, 0); revealed safe (0), 4 safe neighbors, 0 mines, 1 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (3, 2), (3, 1), (4, 1), (4, 0), (5, 0)]\\
+Selected (5, 0); revealed safe (0), 3 safe neighbors, 0 mines, 2 hidden neighbors, probably safe\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (3, 2), (3, 1), (4, 1), (4, 0)]\\
+Selected (4, 0); revealed safe (1), 2 safe neighbors, 0 mines, 3 hidden neighbors, probably safe\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (3, 2), (3, 1), (4, 1)]\\
+Selected (4, 1); revealed safe (1), 5 safe neighbors, 0 mines, 3 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (3, 2), (3, 1)]\\
+Selected (3, 1); revealed safe (2), 3 safe neighbors, 0 mines, 5 hidden neighbors, probably safe\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (3, 2)]\\
+Selected (3, 2); revealed safe (0), 4 safe neighbors, 0 mines, 4 hidden neighbors, probably safe\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (2, 1), (2, 2), (2, 3)]\\
+Selected (2, 3); revealed safe (0), 2 safe neighbors, 0 mines, 6 hidden neighbors, probably safe\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (2, 1), (2, 2), (1, 2), (1, 3)]\\
+Selected (1, 3); revealed safe (1), 3 safe neighbors, 0 mines, 5 hidden neighbors, probably safe\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (2, 1), (2, 2), (1, 2), (0, 2), (0, 5)]\\
+Selected (0, 5); revealed safe (3), 1 safe neighbors, 2 mines, 2 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (2, 1), (2, 2), (1, 2), (0, 2)]\\
+Selected (0, 2); revealed safe (0), 2 safe neighbors, 0 mines, 3 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (2, 1), (2, 2), (1, 2), (0, 1), (1, 1)]\\  
+Selected (1, 1); revealed safe (3), 1 safe neighbors, 0 mines, 7 hidden neighbors, probably safe\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (2, 1), (2, 2), (1, 2), (0, 1)]\\
+Selected (0, 1); revealed safe (2), 2 safe neighbors, 0 mines, 3 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (2, 1), (2, 2), (1, 2)]\\
+Selected (1, 2); revealed safe (0), 6 safe neighbors, 0 mines, 2 hidden neighbors, probably safe\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (2, 1), (2, 2)]\\
+Selected (2, 2); revealed safe (0), 6 safe neighbors, 0 mines, 2 hidden neighbors, probably safe\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3), (2, 1)]\\
+Selected (2, 1); revealed safe (3), 5 safe neighbors, 0 mines, 3 hidden neighbors, probably safe\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (3, 3)]\\
+Selected (3, 3); revealed safe (0), 6 safe neighbors, 0 mines, 2 hidden neighbors, probably safe\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9)]\\
+Selected (6, 9); revealed safe (0), 1 safe neighbors, 0 mines, 4 hidden neighbors, probably safe\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (7, 8), (7, 9)]\\
+Selected (7, 9); revealed safe (1), 1 safe neighbors, 0 mines, 4 hidden neighbors, probably safe\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8), (7, 8)]\\
+Selected (7, 8); revealed safe (1), 2 safe neighbors, 0 mines, 6 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 8)]\\
+Selected (6, 8); revealed safe (0), 4 safe neighbors, 0 mines, 4 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 7), (7, 7)]\\
+Selected (7, 7); revealed safe (2), 2 safe neighbors, 0 mines, 6 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (6, 7)]\\
+Selected (6, 7); revealed safe (1), 3 safe neighbors, 0 mines, 5 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8), (8, 9)]\\
+Selected (8, 9); revealed safe (1), 2 safe neighbors, 0 mines, 3 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7), (5, 8)]\\
+Selected (5, 8); revealed safe (0), 6 safe neighbors, 0 mines, 2 hidden neighbors, probably safe\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9), (5, 7)]\\
+Selected (5, 7); revealed safe (1), 6 safe neighbors, 0 mines, 2 hidden neighbors, probably safe\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9), (4, 9)]\\
+Selected (4, 9); revealed safe (0), 3 safe neighbors, 0 mines, 2 hidden neighbors, probably safe\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (3, 9)]\\
+Selected (3, 9); revealed safe (0), 2 safe neighbors, 0 mines, 3 hidden neighbors, probably safe\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8), (2, 9)]\\
+Selected (2, 9); revealed safe (1), 1 safe neighbors, 0 mines, 4 hidden neighbors, probably safe\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8), (3, 8)]\\
+Selected (3, 8); revealed safe (0), 6 safe neighbors, 0 mines, 2 hidden neighbors, probably safe\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7), (2, 8)]\\
+Selected (2, 8); revealed safe (1), 4 safe neighbors, 0 mines, 4 hidden neighbors, probably safe\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5), (2, 7)]\\
+Selected (2, 7); revealed safe (2), 4 safe neighbors, 1 mines, 3 hidden neighbors, probably safe\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (3, 5)]\\
+Selected (3, 5); revealed safe (0), 5 safe neighbors, 0 mines, 3 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (1, 7), (1, 9)]\\
+Selected (1, 9); revealed safe (1), 2 safe neighbors, 0 mines, 3 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4), (1, 7)]\\
+Selected (1, 7); revealed safe (3), 2 safe neighbors, 2 mines, 4 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6), (3, 4)]\\
+Selected (3, 4); revealed safe (0), 7 safe neighbors, 0 mines, 1 hidden neighbors, unknown\\
+Safe cells: [(1, 5), (2, 4), (2, 6)]\\
+Selected (2, 6); revealed safe (1), 6 safe neighbors, 1 mines, 1 hidden neighbors, probably safe\\
+Safe cells: [(1, 5), (2, 4)]\\
+Selected (2, 4); revealed safe (0), 7 safe neighbors, 0 mines, 1 hidden neighbors, probably safe\\
+Safe cells: [(1, 5)]\\
+Selected (1, 5); revealed safe (3), 5 safe neighbors, 2 mines, 1 hidden neighbors, probably safe\\
+Selected (8, 7); revealed safe (2), 2 safe neighbors, 0 mines, 6 hidden neighbors, unknown\\
+Selected (9, 6); revealed safe (2), 1 safe neighbors, 0 mines, 4 hidden neighbors, unknown\\
+Selected (9, 8); revealed safe (1), 2 safe neighbors, 0 mines, 3 hidden neighbors, unknown\\
+Selected (6, 6); revealed safe (1), 6 safe neighbors, 0 mines, 2 hidden neighbors, unknown\\
+Selected (7, 6); revealed safe (2), 6 safe neighbors, 0 mines, 2 hidden neighbors, unknown\\
+Safe cells: [(8, 4), (9, 5), (9, 7)]\\
+Selected (9, 7); revealed safe (2), 3 safe neighbors, 0 mines, 2 hidden neighbors, unknown\\
+Safe cells: [(8, 4), (9, 5)]\\
+Selected (9, 5); revealed safe (2), 1 safe neighbors, 0 mines, 4 hidden neighbors, unknown\\
+Safe cells: [(8, 4)]\\
+Selected (8, 4); revealed safe (2), 3 safe neighbors, 0 mines, 5 hidden neighbors, unknown\\
+Selected (9, 0); revealed safe (1), 1 safe neighbors, 0 mines, 2 hidden neighbors, unknown\\
+Selected (9, 4); revealed safe (1), 2 safe neighbors, 0 mines, 3 hidden neighbors, unknown\\
+Selected (0, 8); revealed safe (1), 2 safe neighbors, 0 mines, 3 hidden neighbors, unknown\\
+Selected (9, 9); revealed safe (1), 2 safe neighbors, 0 mines, 1 hidden neighbors, unknown\\
+Selected (9, 2); revealed safe (2), 0 safe neighbors, 0 mines, 5 hidden neighbors, unknown\\
+Selected (9, 3); revealed safe (1), 3 safe neighbors, 0 mines, 2 hidden neighbors, unknown\\
+Selected (0, 7); revealed safe (3), 2 safe neighbors, 2 mines, 1 hidden neighbors, unknown\\
+Selected (9, 1); revealed safe (2), 3 safe neighbors, 0 mines, 2 hidden neighbors, unknown\\
+Selected (0, 9); revealed safe (1), 2 safe neighbors, 0 mines, 1 hidden neighbors, unknown\\
+Mine cells: [(5, 6), (6, 3), (7, 3), (8, 3), (8, 1), (8, 2), (3, 0), (2, 0), (0, 4), (0, 0), (1, 0), (8, 8), (1, 8), (8, 6), (8, 5)]\\
+The advanced agent scored: 14 / 16\\
+
+From time to time, our advanced agent may unexpectedly select a cell and mark it as a mine, even if that cell is actually safe, thus resulting in a false positive. In our implementation, we make a note of the number of false positives found, and the program moves on. Apart from the false positives, the program makes selection decisions as intended.\\
+
 \subsection{Performance (cont.)}
 
 \textit{For a fixed, reasonable size of board, plot as a function of mine density the average final score (safely identified mines/total mines) for the simple baseline algorithm and your algorithm for comparison. This will require solving multiple random boards at a given density of mines to get good average score results. Does the graph make sense / agree with your intuition? When does minesweeper become “hard?” When does your algorithm beat the simple algorithm, and when is the simple algorithm better? Why? How frequently is your algorithm able to work out things that the basic agent cannot?}\\
@@ -127,8 +503,16 @@ In essence, Minesweeper becomes "hard" once there are a lot more mines put on th
 
 \textit{Suppose you were told in advance how many mines are on the board. Include this in your knowledge base. How did you model this? Regenerate the plot of mine density vs. average final score with this extra information, and analyze the results.}\\
 
+Given the number of mines left on the board, we could better calculate the risk of each cell being a mine by accounting for every single cell from the very start and update the odds as we mark (or trigger) mines until the very end. We would also know when we have already found all of the mines by tracking the number of mines left on the board.
+
 \subsection{Better Decisions}
 
 \textit{In both the basic and improved agent, when nothing more could be inferred, the agent selects a covered cell at random. Build a better mechanism. How can you justify it? Regenerate the plot of mine density vs. average final score with improved cell selection, and analyze the results.}\\
+
+\begin{center}
+\includegraphics*[scale=0.5]{plot2.png}\\
+\end{center}
+
+In addition to selecting low risk cells using probability, we could try and prioritize selecting cells on the inside first, then cells on the edges, then cells in the corner. The three types of cells have eight neighbors, five neighbors, then three neighbors respectively, and the lower the number of neighbors, the higher the odds of tripping a mine and we get less information about safe cells as well. Corners are high risk, low reward compared to inner cells. The more information we can obtain, the faster we can “expand” the frontier before we have to resort to randomness.
 
 \end{document}
