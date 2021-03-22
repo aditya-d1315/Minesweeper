@@ -187,30 +187,41 @@ public class Main {
         String str = new String();
         try {
             if(env != null) {
+                Environment temp = env;
+
                 System.out.print("Enter the number of trials: ");
                 str = sc.nextLine();
                 int trials = Integer.parseInt(str);
 
+                System.out.print("Enter the mine density (as a decimal): ");
+                str = sc.nextLine();
+                double mineDensity = Double.parseDouble(str);
+
+                int dim = 10;
+                int numMines = (int)(mineDensity * (dim * dim));
                 double basicAgentSum = 0;
                 double advancedAgentSum = 0;
 
                 if(trials > 0) {
 
                     for(int i = 0; i < trials; i++) {
+                        env = new Environment(dim, numMines);
                         runBasicAgent();
                         runAdvancedAgent();
                         basicAgentSum += ((double)basicAgent.calcScore() / (double)env.getNum_mines());
                         advancedAgentSum += ((double)advancedAgent.calcScore() / (double)env.getNum_mines());
                     }
 
-                    double basicAgentAvg = basicAgentSum / trials;
-                    double advancedAgentAvg = advancedAgentSum / trials;
+                    double basicAgentAvg = (basicAgentSum / (double)trials) * 100;
+                    double advancedAgentAvg = (advancedAgentSum / (double)trials) * 100;
 
+                    System.out.println(numMines);
                     System.out.println("Basic agent average score over " + trials + " trials: " + basicAgentAvg);
                     System.out.println("Advanced agent average score over " + trials + " trials: " + advancedAgentAvg);
                 } else {
                     System.out.println("One of your inputs may be invalid. Try again!");
                 }
+                env = temp;
             } else {
                 System.out.println("Please generate a valid board before attempting this.");
             }
