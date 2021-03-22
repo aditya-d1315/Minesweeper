@@ -5,6 +5,10 @@ import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.Scanner;
 
+/**
+ * This class contains the terminal UI for Minesweeper.
+ * @author Aditya Dhawan, Annie Thach
+ */
 public class Main {
     private static Environment env = null;
     private static BasicAgent basicAgent = null;
@@ -86,8 +90,13 @@ public class Main {
                 basicAgent.queryCell(row, col);     // Query the cell for information.
 
                 System.out.println("Selected (" + row + ", " + col + "); " + basicAgent.getKnowledgeBase()[row][col]);
-                System.out.println("\tSafe cells: " + basicAgent.getSafeCells());
-                System.out.println("\tMine cells: " + basicAgent.getMineCells());
+                if(!basicAgent.getSafeCells().empty()) {
+                    System.out.println("Marked safe: " + basicAgent.getSafeCells());
+                }
+                
+                if(!basicAgent.getMineCells().isEmpty()) {
+                    System.out.println("Marked mines: " + basicAgent.getMineCells());
+                }
             }
 
             // Check score.
@@ -136,6 +145,7 @@ public class Main {
     
                     // If heap is empty (no cells with probabilities < 0.5):
                     if(unprocessedKnown.isEmpty()) {
+                        /*
                         // Build a list of unprocessed cells.
                         ArrayList<Index> unprocessed = new ArrayList<Index>();
                         for(int i = 0; i < knowledgeBase.length; i++) {
@@ -146,6 +156,62 @@ public class Main {
                                 }
                             }
                         }
+                        */
+
+                        
+                        // Comment out above! This bit is for prioritizing inner cell > edge cells > corner cells.
+                        // Build a list of inner cells to process.
+                        ArrayList<Index> unprocessed = new ArrayList<Index>();
+
+                        for(int i = 0; i < knowledgeBase.length; i++) {
+                            for(int j = 0; j < knowledgeBase.length; j++) {
+                                Index index = new Index(i, j);
+                                if(!knowledgeBase[i][j].getRevealed()
+                                    && !mineCells.contains(index)
+                                    && (i != 0 && j != 0 && i != knowledgeBase.length - 1 && j != knowledgeBase.length - 1)) {
+                                        unprocessed.add(index);
+                                }
+                            }
+                        }
+
+                        // Build a list of edge cells to process.
+                        if(unprocessed.isEmpty()) {
+                            for(int i = 0; i < knowledgeBase.length; i++) {
+                                for(int j = 0; j < knowledgeBase.length; j++) {
+                                    Index index = new Index(i, j);
+                                    if(!knowledgeBase[i][j].getRevealed()
+                                        && !mineCells.contains(index)
+                                        && (!((i == 0 && j == 0) || (i == 0 && j == knowledgeBase.length - 1) || (i == knowledgeBase.length && j == 0) || (i == knowledgeBase.length && j == knowledgeBase.length)))) {
+                                            unprocessed.add(index);
+                                    }
+                                }
+                            }
+                        }
+
+                        // Build a list of corner cells to process.
+                        if(unprocessed.isEmpty()) {
+                            Index topLeft = new Index(0, 0);
+                            Index topRight = new Index(0, knowledgeBase.length - 1);
+                            Index bottomLeft = new Index(knowledgeBase.length - 1, 0);
+                            Index bottomRight = new Index(knowledgeBase.length - 1, knowledgeBase.length - 1);
+
+                            if(!knowledgeBase[0][0].getRevealed() && !mineCells.contains(topLeft)) {
+                                unprocessed.add(topLeft);
+                            }
+
+                            if(!knowledgeBase[0][knowledgeBase.length - 1].getRevealed() && !mineCells.contains(topRight)) {
+                                unprocessed.add(topRight);
+                            }
+
+                            if(!knowledgeBase[knowledgeBase.length - 1][0].getRevealed() && !mineCells.contains(bottomLeft)) {
+                                unprocessed.add(bottomLeft);
+                            }
+
+                            if(!knowledgeBase[knowledgeBase.length - 1][knowledgeBase.length - 1].getRevealed() && !mineCells.contains(bottomRight)) {
+                                unprocessed.add(bottomRight);
+                            }
+                        }
+                        
                     
                         // If the list is empty, then there is nothing left to process.
                         if(unprocessed.isEmpty()) {
@@ -168,8 +234,13 @@ public class Main {
                 advancedAgent.updateAllKnownProbabilities();    // Update probabilities w/ new clue.
 
                 System.out.println("Selected (" + row + ", " + col + "); " + advancedAgent.getKnowledgeBase()[row][col]);
-                System.out.println("\tSafe cells: " + advancedAgent.getSafeCells());
-                System.out.println("\tMine cells: " + advancedAgent.getMineCells());
+                if(!advancedAgent.getSafeCells().isEmpty()) {
+                    System.out.println("Marked safe: " + advancedAgent.getSafeCells());
+                }
+
+                if(!advancedAgent.getMineCells().isEmpty()) {
+                    System.out.println("Marked mines: " + advancedAgent.getMineCells());
+                }
             }
     
             // Check score.
@@ -234,7 +305,7 @@ public class Main {
         // Generate a 16x16 board with 40 mines by default.
         env = new Environment(16, 40);
 
-        String commandsList = "'g' to generate new board.\n'b' to run basic agent.\n'a' to run advanced agent.\n'avg' to get the average scores of both agents for current board.\n'pb' to print the original board.\n'pkb' to print the basic agent's resulting knowledge base.\n'pka' to print the advanced agent's resulting knowledge base.\n'h' to bring this list up again.\n'q' to quit the program.";
+        String commandsList = "'g' to generate new board.\n'b' to run basic agent.\n'a' to run advanced agent.\n'avg' to get the average scores of both agents for current board.\n'pb' to print the original board.\n'pkb' to run and print the basic agent's resulting knowledge base.\n'pka' to run and print the advanced agent's resulting knowledge base.\n'h' to bring this list up again.\n'q' to quit the program.";
 
         System.out.println("Welcome to Minesweeper!");
         System.out.println("The commands are as follows:");
@@ -244,7 +315,7 @@ public class Main {
 
         while(true) {
             System.out.print("Enter a command: ");
-            cmd = sc.nextLine();
+            cmd = sc.nextLine().trim();
     
             if(cmd.equalsIgnoreCase("q")) {
                 System.out.println("Quitting...");
@@ -265,22 +336,23 @@ public class Main {
             } else if(cmd.equalsIgnoreCase("pb")) {
                 System.out.println("Original board:\n" + env);
             } else if(cmd.equalsIgnoreCase("pkb")) {
-                if(basicAgent == null) {
-                    runBasicAgent();
-                }
+                runBasicAgent();
                 System.out.println("Basic agent's knowledge base:\n" + basicAgent);
-                System.out.println("The basic agent scored: " + basicAgent.calcScore() + " / " + env.getNum_mines());
+                System.out.println("Number of mines marked: " + basicAgent.getMineCells().size());
+                // System.out.println("The basic agent scored: " + basicAgent.calcScore() + " / " + env.getNum_mines());
             } else if(cmd.equalsIgnoreCase("pka")) {
-                if(advancedAgent == null) {
-                    runAdvancedAgent();
-                }
+                runAdvancedAgent();
+
                 System.out.println("Advanced agent's knowledge base:\n" + advancedAgent);
-                System.out.println("The advanced agent scored: " + advancedAgent.calcScore() + " / " + env.getNum_mines());
+                // System.out.println("The advanced agent scored: " + advancedAgent.calcScore() + " / " + env.getNum_mines());
+                System.out.println("Number of mines marked: " + advancedAgent.getMineCells().size());
+                System.out.println("Number of safe cells falsely marked as mine: " + advancedAgent.calcFalsePositive());
             } else if(cmd.equalsIgnoreCase("h")) {
                 System.out.println(commandsList);
             } else {
                 System.out.println("Invalid command! Type 'h' for a list of valid commands.");
             }
+            
             System.out.println();
         }
 
