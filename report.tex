@@ -85,7 +85,7 @@ The basic agent’s knowledge base is a parallel matrix that represents the boar
 
 In addition to the knowledge base the agent keeps a stack of safe cells to visit and a list of suspected mines to not visit. Cells that have been deemed safe using the knowledge base are represented with ‘s’ and suspected mines are represented by ‘m’.\\
 
-The improved agent selects cells with the highest probability of being safe. (WIP)
+The improved agent selects cells with the highest probability of being safe. It represents information and knowledge the exact same way as the basic agent, except it makes use of a ModifiedCell data structure. This structure carries with it additional instance variables that represent its probability of being a mine, which is based on both the number of clues that neighbor it and the total number of unrevealed neighboring cells around those clues. 
 
 \subsection{Inference}
 
@@ -93,13 +93,13 @@ The improved agent selects cells with the highest probability of being safe. (WI
 
 Whenever a cell is selected, it then updates the probability values of the surrounding cells that have not yet been revealed, and from those values determines whether neighboring cells are either mines or safe. To represent this information, we make use of ArrayLists that update whenever a cell can be concluded as safe or as a mine. These ArrayLists hold the Index type, which is an abstract data type that holds information on the specific position of the cell. Essentially, before a cell is selected, the program checks to see if the ArrayList for safe cells contains anything to check first, that way the agent can step to those cells to clear more of the board and gain more clues. If in the case that there is nothing in the ArrayList for safe cells, the program will try to randomly select a position in the matrix, and will check against the ArrayList for cells that are suspected as mines in order to avoid them.\\
 
-TODO: Does the program deduce everything it can before proceeding?
+We believe that our program is able to deduce as much as possible from an uncovered clue. If we consider how the program is implemented, a cell that neighbors a previously-revealed clue will have already had its probability of being a mine set accordingly. In turn, once we uncover a new clue that neighbors that same cell, it will cause the probability of that cell to update to reflect the combined chance of being a mine from both clues. From this reasoning, we can be sure that any newly-uncovered clue will work in tandem with previously-uncovered clues to deduce probable mines and safe spots.
 
 \subsection{Decisions}
 
 \textit{Given a current state of the board, and a state of knowledge about the board, how does your program decide which cell to search next?}\\
 
-Given the current state of the board, the program prioritizes selecting a cell that exists within the ArrayList for safe cells. If this is not the case, then the program will attempt to select a cell semi-randomly, while taking probabilities into account; the lower the probability that a cell is a mine, the more likely it is to be selected.
+Given the current state of the board and knowledge about the board, the program prioritizes selecting any cell that exists within the ArrayList for safe cells. Cells would have been added to this ArrayList if they were confirmed to be safe by previous clues. If this ArrayList happens to be empty, then the program will attempt to select a cell semi-randomly, while taking probabilities into account; the lower the probability that a cell is a mine, the more likely it is to be selected. 
 
 \subsection{Performance}
 
